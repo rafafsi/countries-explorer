@@ -12,14 +12,18 @@ const flag = document.getElementById('flag');
 const endpoint = "https://restcountries.com/v3.1/all";
 const countries = [];
 
-fetch(endpoint)
-    .then(blob => blob.json())
-    .then(data => {
+
+const fetchData = async() => {
+    try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
         countries.push(...data);
         populateList(countries);
-    })
-    .catch(err => console.error(`we got an error: ${err}`));
-
+    } catch (error) {
+        console.error(error)
+    }
+}
+fetchData();
 
 function populateList(countries) {
     let option = "";
