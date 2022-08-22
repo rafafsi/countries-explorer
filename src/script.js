@@ -1,6 +1,6 @@
 const list = document.querySelector(".countries");
 const form = document.querySelector("form");
-const titles = document.querySelectorAll('.place');
+const title = document.querySelector('.place');
 
 const capital = document.getElementById('capital');
 const currency = document.getElementById('currency');
@@ -13,55 +13,7 @@ const endpoint = "https://restcountries.com/v3.1/all";
 const countries = [];
 
 
-const fetchData = async() => {
-    try {
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        countries.push(...data);
-        populateList(countries);
-    } catch (error) {
-        console.error(error)
-    }
-}
-fetchData();
-
-function populateList(countries) {
-    let option = "";
-    let arrCountries = [];
-
-    countries
-        .forEach(country => {
-            let countryName = `${country.name.common}`
-            arrCountries.push(countryName)
-        });
-
-    arrCountries
-        .sort()
-        .forEach(country => option += `<option value="${country}"> ${country} </option>`)
-
-    list.innerHTML = option;
-}
-
-function getCountry(e) {
-    e.preventDefault();
-    let countrySelected = `${list.value}`;
-    titles.forEach(title => title.textContent  = `${countrySelected}!`);
-    getData(countrySelected);
-}
-
-function getData(selected) {
-    let countryName = countries.find(country => country.name.common === selected);
-
-    capital.innerHTML = handleCapital(countryName);;
-    currency.innerHTML = handleCurrency(countryName);
-    languages.innerHTML = handleLanguages(countryName);
-    population.innerHTML = handlePopulation(countryName);
-    map.innerHTML = handleMap(countryName)
-    flag.innerHTML = `<img src="${countryName.flags.png}">`;
-}
-
-
-function handleCapital(countryName) {
+const handleCapital = (countryName) => {
     if (countryName.capital) {
 
         let capitals = countryName.capital;
@@ -69,7 +21,7 @@ function handleCapital(countryName) {
 
         for (const capital in capitals) {
             nameCap = capitals[capital];
-            allCap.push(nameCap)
+            allCap.push(nameCap);
         }
 
         if(allCap.length > 1) {
@@ -80,11 +32,11 @@ function handleCapital(countryName) {
             return capitals;
         }
     } else {
-        return `has no official capital`
+        return `has no official capital`;
     } 
 }
 
-function handleCurrency(countryName) {
+const handleCurrency = (countryName) => {
     if(countryName.currencies) {
 
         let objCurrencies = countryName.currencies;
@@ -93,8 +45,8 @@ function handleCurrency(countryName) {
         for (const currency in objCurrencies) {
             let name = countryName.currencies[currency].name;
             let symbol = countryName.currencies[currency].symbol;
-            let curr = `${name} - ${currency} (${symbol || ""})`
-            allCurr.push(curr)
+            let curr = `${name} - ${currency} (${symbol || ""})`;
+            allCurr.push(curr);
         }
 
         if (allCurr.length > 1) {
@@ -111,23 +63,23 @@ function handleCurrency(countryName) {
         return `Australian dollar`
     }
     else {
-        return `has no official currency`
+        return `has no official currency`;
     }
 }
 
 
-function handlePopulation(countryName) {
+const handlePopulation = (countryName) => {
     if(countryName.population) {
         let population = countryName.population
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         return population;
     } else {
-        return `has no official data`
+        return `has no official data`;
     }
 }
 
-function handleLanguages(countryName) {
+const handleLanguages = (countryName) => {
     if(countryName.languages) {
         let langs = [];
         let objLanguages = Object.values(countryName.languages);
@@ -139,17 +91,17 @@ function handleLanguages(countryName) {
         if(langs.length > 1 ) {
             let last = langs.pop();
             let finalLangs = `${langs.join(', ')} and ${last}`;
-            return finalLangs        
+            return finalLangs; 
         } else {
             return langs;
         }
         
     } else { 
-        return `has no official language.`
+        return `has no official language`;
     }
 }
 
-function handleMap(countryName) {
+const handleMap = (countryName) => {
     let srcMap = countryName.maps.googleMaps;
     let html = `<a href="${srcMap}" target="_blank"> <img src="../img/icon.png"></a>`;
     
@@ -157,9 +109,54 @@ function handleMap(countryName) {
         
 }
 
+const getData = (selected) => {
+    let countryName = countries.find(country => country.name.common === selected);
 
+    capital.innerHTML = handleCapital(countryName);
+    currency.innerHTML = handleCurrency(countryName);
+    languages.innerHTML = handleLanguages(countryName);
+    population.innerHTML = handlePopulation(countryName);
+    map.innerHTML = handleMap(countryName)
+    flag.innerHTML = `<img src="${countryName.flags.png}">`;
+}
 
+const getCountry = (e) => {
+    e.preventDefault();
+    let countrySelected = `${list.value}`;
+    title.textContent  = `${countrySelected}!`;
+    getData(countrySelected);
+}
+
+const populateList = (countries) => {
+    let option = "";
+    let arrCountries = [];
+
+    countries
+        .forEach(country => {
+            let countryName = `${country.name.common}`;
+            arrCountries.push(countryName);
+        });
+
+    arrCountries
+        .sort()
+        .forEach(country => option += `<option value="${country}"> ${country} </option>`);
+
+    list.innerHTML = option;
+}
+
+const fetchData = async() => {
+    try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        countries.push(...data);
+        populateList(countries);
+    } catch (error) {
+        console.error(error)
+    }
+}
 
 form.addEventListener('submit', getCountry);
+
+window.onload = fetchData();
 
 
