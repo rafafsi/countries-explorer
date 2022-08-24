@@ -12,64 +12,58 @@ const flag = document.getElementById('flag');
 const endpoint = "https://restcountries.com/v3.1/all";
 const countries = [];
 
+const joinAnd = (arr) => {
+    if(arr.length > 1) {
+        let last = arr.pop();
+        let finalArr = `${arr.join(', ')} and ${last}`;
+        return finalArr;
+    } else {
+        return arr[0];
+    }
+} 
 
 const handleCapital = (countryName) => {
     if (countryName.capital) {
-
         let capitals = countryName.capital;
         let allCap = [];
 
         for (const capital in capitals) {
-            nameCap = capitals[capital];
+            let nameCap = capitals[capital];
             allCap.push(nameCap);
         }
 
-        if(allCap.length > 1) {
-            let last = allCap.pop();
-            let finalCap = `${allCap.join(', ')} and ${last}`;
-            return finalCap;
-        } else {
-            return capitals;
-        }
+        return joinAnd(allCap);
     } else {
         return `has no official capital`;
-    } 
+    }
 }
 
 const handleCurrency = (countryName) => {
-    if(countryName.currencies) {
+    if (countryName.currencies) {
 
         let objCurrencies = countryName.currencies;
         let allCurr = [];
-        
+
         for (const currency in objCurrencies) {
             let name = countryName.currencies[currency].name;
             let symbol = countryName.currencies[currency].symbol;
             let curr = `${name} - ${currency} (${symbol || ""})`;
             allCurr.push(curr);
         }
-
-        if (allCurr.length > 1) {
-            let last = allCurr.pop();
-            let finalCurr = `${allCurr.join(', ')} and ${last}`;
-            return finalCurr;
-        } else {
-            return allCurr;
-        }
-        
-    } if(countryName.name.common === "Antarctica") {
-        return `Antarctic dollar`
-    } if(countryName.name.common === "Heard Island and McDonald Islands"){
-        return `Australian dollar`
-    }
-    else {
+        return joinAnd(allCurr);
+    } 
+    
+    if (countryName.name.common === "Antarctica") {
+        return `Antarctic dollar`;
+    } if (countryName.name.common === "Heard Island and McDonald Islands") {
+        return `Australian dollar`;
+    } else {
         return `has no official currency`;
     }
 }
 
-
 const handlePopulation = (countryName) => {
-    if(countryName.population) {
+    if (countryName.population) {
         let population = countryName.population
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -80,23 +74,16 @@ const handlePopulation = (countryName) => {
 }
 
 const handleLanguages = (countryName) => {
-    if(countryName.languages) {
-        let langs = [];
+    if (countryName.languages) {
+        let allLangs = [];
         let objLanguages = Object.values(countryName.languages);
-        
+
         for (const lang of objLanguages) {
-            langs.push(lang);
+            allLangs.push(lang);
         }
 
-        if(langs.length > 1 ) {
-            let last = langs.pop();
-            let finalLangs = `${langs.join(', ')} and ${last}`;
-            return finalLangs; 
-        } else {
-            return langs;
-        }
-        
-    } else { 
+        return joinAnd(allLangs);
+    } else {
         return `has no official language`;
     }
 }
@@ -104,9 +91,8 @@ const handleLanguages = (countryName) => {
 const handleMap = (countryName) => {
     let srcMap = countryName.maps.googleMaps;
     let html = `<a href="${srcMap}" target="_blank"> <img src="../img/icon.png"></a>`;
-    
+
     return map.innerHTML = html;
-        
 }
 
 const getData = (selected) => {
@@ -117,13 +103,13 @@ const getData = (selected) => {
     languages.innerHTML = handleLanguages(countryName);
     population.innerHTML = handlePopulation(countryName);
     map.innerHTML = handleMap(countryName)
-    flag.innerHTML = `<img src="${countryName.flags.png}">`;
+    flag.innerHTML = `<img src="${countryName.flags.svg}">`;
 }
 
 const getCountry = (e) => {
     e.preventDefault();
     let countrySelected = `${list.value}`;
-    title.textContent  = `${countrySelected}!`;
+    title.textContent = `${countrySelected}!`;
     getData(countrySelected);
 }
 
@@ -151,12 +137,11 @@ const fetchData = async() => {
         countries.push(...data);
         populateList(countries);
     } catch (error) {
-        console.error(error)
+        alert(`Ops! Something went wrong! 
+        Please, reload the page.`);
+        console.error(error);
     }
 }
 
 form.addEventListener('submit', getCountry);
-
-window.onload = fetchData();
-
-
+fetchData();
